@@ -2,14 +2,19 @@
 
 require_once __DIR__."/../vendor/autoload.php";
 
-use App\Controller\FeedbackController;
+use App\Core\Router;
 
+$router = new Router('/php-sandbox/public');
 
-$controller = new FeedbackController();
+/**
+ * Register routes
+ */
+$router->get('/', 'FeedbackController@index');
+$router->get('/feedback', 'FeedbackController@index');
+$router->get('/feedback/add', 'FeedbackController@create');
+$router->post('/feedback/store', 'FeedbackController@store');
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $controller->store();
-} else {
-    $controller->index();
-}
-
+/**
+ * Dispatch current request
+ */
+$router->dispatch();

@@ -20,6 +20,12 @@ class FeedbackController extends Controller{
         $this->view('feedback/index', compact('feedbacks'));
     }
 
+    /** GET /feedback/add */
+    public function create(): void
+    {
+        $this->view('feedback/create');
+    }
+
     public function store(): void
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -29,8 +35,9 @@ class FeedbackController extends Controller{
             if ($name && $comment) {
                 $this->feedback->create($name, $comment);
             }
-            $redirectTo = $_SERVER['HTTP_REFERER'] ?? '/';
-            header("Location: $redirectTo");
+            // $redirectTo = $_SERVER['HTTP_REFERER'] ?? '/';
+            // header("Location: $redirectTo");
+            header("Location: /php-sandbox/public");
             exit;
         }
     }

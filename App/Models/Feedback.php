@@ -15,7 +15,7 @@ class Feedback{
 
      public function getAll(): array
     {
-        $stmt = $this->db->query("SELECT * FROM feedbacks ORDER BY id DESC");
+        $stmt = $this->db->query("SELECT * FROM feedbacks ORDER BY date DESC");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 

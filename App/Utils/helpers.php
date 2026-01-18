@@ -27,3 +27,8 @@ function current_url(): string
 
     return $scheme . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 }
+
+function url(string $path = ''): string
+{
+    return '/php-sandbox/public' . '/' . ltrim($path, '/');
+}

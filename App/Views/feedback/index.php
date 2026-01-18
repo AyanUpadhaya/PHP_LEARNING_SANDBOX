@@ -1,5 +1,7 @@
 
-
+<?php
+    use function App\Utils\url;
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,24 +11,10 @@
 <body class="bg-light">
 
 <div class="container mt-5">
-    <div class="card p-4 mb-4">
-        <h4>Add Feedback</h4>
-
-        <form method="POST">
-           
-            <div class="mb-3">
-                <input name="name" class="form-control" placeholder="Your Name" required>
-            </div>
-
-            <div class="mb-3">
-                <textarea name="comment" class="form-control" placeholder="Your Feedback" required></textarea>
-            </div>
-
-            <button class="btn btn-primary">Submit</button>
-        </form>
-    </div>
-
+   
     <h4>Feedback List</h4>
+
+    <a href="<?= url('feedback/add') ?>" class="btn btn-primary mb-3">Add Feedback</a>
 
     <?php foreach ($feedbacks as $feedback): ?>
         <div class="card mb-2">
