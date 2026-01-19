@@ -19,7 +19,11 @@
     <?php foreach ($feedbacks as $feedback): ?>
         <div class="card mb-2">
             <div class="card-body">
-                <strong><?= htmlspecialchars($feedback['name']) ?></strong>
+                <strong>
+                    <a href="<?= url('feedback/show/'.$feedback['id']) ?>">
+                        <?= htmlspecialchars($feedback['name']) ?>
+                    </a>
+                </strong>
                 <p><?= htmlspecialchars($feedback['comment']) ?></p>
                 <small class="text-muted"><?= $feedback['date'] ?></small>
             </div>

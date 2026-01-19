@@ -26,6 +26,12 @@ class FeedbackController extends Controller{
         $this->view('feedback/create');
     }
 
+    public function show($id)
+    {
+        $feedback = $this->feedback->show_single($id);
+        $this->view('feedback/show', compact('feedback'));
+    }
+
     public function store(): void
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {

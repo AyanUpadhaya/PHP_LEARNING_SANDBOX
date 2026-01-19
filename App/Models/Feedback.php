@@ -13,12 +13,24 @@ class Feedback{
         $this->db = (new Database())->getConnection();
     }
 
-     public function getAll(): array
+    public function getAll(): array
     {
         $stmt = $this->db->query("SELECT * FROM feedbacks ORDER BY date DESC");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+   public function show_single(int $id): ?array
+    {
+        $stmt = $this->db->prepare(
+            "SELECT * FROM feedbacks WHERE id = :id LIMIT 1"
+        );
 
+        $stmt->execute([
+            'id' => $id
+        ]);
+
+        return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+    }
+    
     public function create(string $name, string $comment): bool
     {
         $stmt = $this->db->prepare(

@@ -4,61 +4,81 @@ namespace App\Core;
 
 class Router
 {
+    protected array $routes = [];
     private string $basePath;
-    private array $routes = [
-        'GET' => [],
-        'POST' => []
-    ];
 
     public function __construct(string $basePath = '')
     {
-        $this->basePath = rtrim($basePath, '/');
+        $this->basePath = '/' . trim($basePath, '/');
     }
 
-    public function get(string $uri, string $action): void
+    public function get(string $uri, array $action)
     {
-        $this->routes['GET'][$this->normalize($uri)] = $action;
+        $this->addRoute('GET', $uri, $action);
     }
 
-    public function post(string $uri, string $action): void
+    public function post(string $uri, array $action)
     {
-        $this->routes['POST'][$this->normalize($uri)] = $action;
+        $this->addRoute('POST', $uri, $action);
     }
 
-    public function dispatch(): void
+    protected function addRoute(string $method, string $uri, array $action)
     {
-        $method = $_SERVER['REQUEST_METHOD'];
-        $uri = $this->getCurrentUri();
+        $this->routes[] = [
+            'method' => $method,
+            'uri' => trim($uri, '/'),
+            'action' => $action
+        ];
+    }
 
-        if (!isset($this->routes[$method][$uri])) {
-            http_response_code(404);
-            echo "404 - Page Not Found";
-            return;
+    public function dispatch()
+    {
+        $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+        // Remove base path
+        if ($this->basePath !== '/' && str_starts_with($requestUri, $this->basePath)) {
+            $requestUri = substr($requestUri, strlen($this->basePath));
         }
 
-        [$controller, $methodName] =
-            explode('@', $this->routes[$method][$uri]);
+        $requestUri = trim($requestUri, '/');
+        $requestMethod = $_SERVER['REQUEST_METHOD'];
 
-        $controllerClass = "App\\Controller\\$controller";
-        $controllerInstance = new $controllerClass();
+        foreach ($this->routes as $route) {
+            if ($route['method'] !== $requestMethod) {
+                continue;
+            }
 
-        call_user_func([$controllerInstance, $methodName]);
-    }
+            // Convert /feedback/{id} to regex
+            $pattern = preg_replace(
+                '#\{([\w]+)\}#',
+                '(?P<$1>[^/]+)',
+                $route['uri']
+            );
 
-    private function getCurrentUri(): string
-    {
-        $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+            $pattern = "#^{$pattern}$#";
 
-        // remove base path
-        if ($this->basePath && str_starts_with($uri, $this->basePath)) {
-            $uri = substr($uri, strlen($this->basePath));
+            if (preg_match($pattern, $requestUri, $matches)) {
+
+                $params = [];
+                foreach ($matches as $key => $value) {
+                    if (is_string($key)) {
+                        $params[$key] = $value;
+                    }
+                }
+
+                [$controller, $method] = $route['action'];
+
+                $controller = "App\\Controller\\{$controller}";
+                $instance = new $controller;
+
+                return call_user_func_array(
+                    [$instance, $method],
+                    $params
+                );
+            }
         }
 
-        return $this->normalize($uri);
-    }
-
-    private function normalize(string $uri): string
-    {
-        return '/' . trim($uri, '/');
+        http_response_code(404);
+        require __DIR__ . '/../Views/errors/404.php';
     }
 }

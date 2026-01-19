@@ -6,13 +6,10 @@ use App\Core\Router;
 
 $router = new Router('/php-sandbox/public');
 
-/**
- * Register routes
- */
-$router->get('/', 'FeedbackController@index');
-$router->get('/feedback', 'FeedbackController@index');
-$router->get('/feedback/add', 'FeedbackController@create');
-$router->post('/feedback/store', 'FeedbackController@store');
+$router->get('/', ['FeedbackController', 'index']);
+$router->get('/feedback/add', ['FeedbackController', 'create']);
+$router->post('/feedback/store', ['FeedbackController', 'store']);
+$router->get('/feedback/show/{id}', ['FeedbackController', 'show']);
 
 /**
  * Dispatch current request
